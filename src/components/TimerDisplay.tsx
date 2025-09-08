@@ -44,7 +44,6 @@ export const TimerDisplay = memo<TimerDisplayProps>(({ time, isActive, className
   return (
     <div className={cn(
       "flex items-center justify-center gap-2 font-mono",
-      isActive && "timer-pulse",
       className
     )}>
       <div className="text-center">

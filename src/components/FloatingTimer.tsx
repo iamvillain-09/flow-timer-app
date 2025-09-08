@@ -7,13 +7,15 @@ interface FloatingTimerProps {
   isActive: boolean;
   position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   onPositionChange: (position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => void;
+  opacity: number;
 }
 
 export const FloatingTimer = memo<FloatingTimerProps>(({ 
   time, 
   isActive, 
   position, 
-  onPositionChange 
+  onPositionChange,
+  opacity 
 }) => {
   const positionClasses = {
     'top-left': 'top-4 left-4',
@@ -33,16 +35,16 @@ export const FloatingTimer = memo<FloatingTimerProps>(({
     <div 
       className={cn(
         "fixed z-50 select-none cursor-pointer",
-        "bg-card/80 backdrop-blur-md rounded-2xl",
-        "border border-border/50 shadow-floating",
-        "p-3 min-w-[120px]",
-        "transition-all duration-300 ease-smooth",
+        "bg-card backdrop-blur-md rounded-lg",
+        "border border-border/30",
+        "p-2 min-w-[100px]",
+        "transition-all duration-200",
         "hover:scale-105 active:scale-95",
-        isActive && "timer-float",
         positionClasses[position]
       )}
       onClick={handlePositionCycle}
       style={{ 
+        opacity: opacity / 100,
         WebkitUserSelect: 'none',
         userSelect: 'none',
         WebkitTouchCallout: 'none'
@@ -53,15 +55,15 @@ export const FloatingTimer = memo<FloatingTimerProps>(({
           time={time} 
           isActive={isActive} 
           size="small" 
-          className="text-sm"
+          className="text-xs font-medium"
         />
-        <div className="text-xs text-muted-foreground mt-1">
+        <div className="text-[10px] text-muted-foreground/80 mt-0.5">
           Screen Time
         </div>
       </div>
       
       {/* Position indicator */}
-      <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary opacity-50" />
+      <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-primary/60" />
     </div>
   );
 });

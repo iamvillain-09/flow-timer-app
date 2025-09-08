@@ -143,20 +143,7 @@ All colors MUST be HSL.
     }
   }
 
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-
   .timer-pulse {
     animation: pulse-glow 2s infinite;
-  }
-
-  .timer-float {
-    animation: float 3s ease-in-out infinite;
   }
 }

@@ -13,6 +13,7 @@ type TimerPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 export const ScreenTimeApp = () => {
   const { time, isActive, isPaused, startTimer, stopTimer, resetTimer } = useScreenTimeTracker();
   const [floatingPosition, setFloatingPosition] = useState<TimerPosition>('top-right');
+  const [floatingOpacity, setFloatingOpacity] = useState(80);
   const [showSettings, setShowSettings] = useState(false);
   const [currentTime, setCurrentTime] = useState(time);
 
@@ -154,6 +155,8 @@ export const ScreenTimeApp = () => {
             <PositionSelector
               currentPosition={floatingPosition}
               onPositionChange={setFloatingPosition}
+              opacity={floatingOpacity}
+              onOpacityChange={setFloatingOpacity}
             />
           </Card>
         )}
@@ -179,6 +182,7 @@ export const ScreenTimeApp = () => {
           isActive={!isPaused}
           position={floatingPosition}
           onPositionChange={setFloatingPosition}
+          opacity={floatingOpacity}
         />
       )}
     </div>
