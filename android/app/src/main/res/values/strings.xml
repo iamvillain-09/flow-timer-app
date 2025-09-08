@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Flow Timer</string>
+    <string name="title_activity_main">Flow Timer</string>
+    <string name="package_name">com.flowtimer.app</string>
+    <string name="custom_url_scheme">com.flowtimer.app</string>
+</resources>
