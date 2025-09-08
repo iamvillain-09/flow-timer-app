@@ -37,9 +37,8 @@ export const FloatingTimer = memo<FloatingTimerProps>(({
         "fixed z-50 select-none cursor-pointer",
         "bg-card backdrop-blur-md rounded-lg",
         "border border-border/30",
-        "p-2 min-w-[100px]",
+        "p-2 min-w-[84px]",
         "transition-all duration-200",
-        "hover:scale-105 active:scale-95",
         positionClasses[position]
       )}
       onClick={handlePositionCycle}
@@ -57,13 +56,9 @@ export const FloatingTimer = memo<FloatingTimerProps>(({
           size="small" 
           className="text-xs font-medium"
         />
-        <div className="text-[10px] text-muted-foreground/80 mt-0.5">
-          Screen Time
-        </div>
       </div>
       
       {/* Position indicator */}
-      <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-primary/60" />
     </div>
   );
 });

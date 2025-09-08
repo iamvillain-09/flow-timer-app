@@ -11,26 +11,25 @@ import { cn } from '@/lib/utils';
 type TimerPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 export const ScreenTimeApp = () => {
-  const { time, isActive, isPaused, startTimer, stopTimer, resetTimer } = useScreenTimeTracker();
+  const { getTime, isActive, isPaused, startTimer, stopTimer, resetTimer } = useScreenTimeTracker();
   const [floatingPosition, setFloatingPosition] = useState<TimerPosition>('top-right');
   const [floatingOpacity, setFloatingOpacity] = useState(80);
   const [showSettings, setShowSettings] = useState(false);
-  const [currentTime, setCurrentTime] = useState(time);
+  const [currentTime, setCurrentTime] = useState(getTime());
 
-  // Update current time for smooth display
+  // Keep UI in sync every second while active
   useEffect(() => {
-    setCurrentTime(time);
-  }, [time]);
+    setCurrentTime(getTime());
+  }, []);
 
-  // Real-time update for active timer
   useEffect(() => {
-    if (isActive && !isPaused) {
+    if (isActive) {
       const interval = setInterval(() => {
-        setCurrentTime(prev => prev + 1);
+        setCurrentTime(getTime());
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [isActive, isPaused]);
+  }, [isActive, isPaused, getTime]);
 
   const handleStartStop = () => {
     if (isActive) {
@@ -93,7 +92,7 @@ export const ScreenTimeApp = () => {
                 isActive 
                   ? isPaused 
                     ? "bg-timer-paused" 
-                    : "bg-timer-active animate-pulse"
+                    : "bg-timer-active"
                   : "bg-timer-stopped"
               )} />
               {isActive 

@@ -35,7 +35,7 @@ export const TransparencySelector = ({ opacity, onOpacityChange, className }: Tr
           className="bg-card backdrop-blur-md rounded-lg border border-border/30 p-2 text-xs text-center min-w-[80px]"
           style={{ opacity: opacity / 100 }}
         >
-          <div className="font-mono font-medium">01:23:45</div>
+          <div className="font-mono font-medium">01:23</div>
           <div className="text-[10px] text-muted-foreground/80 mt-0.5">Preview</div>
         </div>
       </div>

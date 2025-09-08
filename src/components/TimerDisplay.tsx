@@ -12,17 +12,15 @@ export const TimerDisplay = memo<TimerDisplayProps>(({ time, isActive, className
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
+
+    const HH = hours.toString().padStart(2, '0');
+    const MM = minutes.toString().padStart(2, '0');
 
     if (size === 'small') {
-      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      return `${HH}:${MM}`;
     }
 
-    return {
-      hours: hours.toString().padStart(2, '0'),
-      minutes: minutes.toString().padStart(2, '0'),
-      seconds: secs.toString().padStart(2, '0'),
-    };
+    return { hours: HH, minutes: MM };
   };
 
   const timeValue = formatTime(time);
@@ -39,7 +37,7 @@ export const TimerDisplay = memo<TimerDisplayProps>(({ time, isActive, className
     );
   }
 
-  const timeObj = timeValue as { hours: string; minutes: string; seconds: string };
+  const timeObj = timeValue as { hours: string; minutes: string };
 
   return (
     <div className={cn(
@@ -64,16 +62,6 @@ export const TimerDisplay = memo<TimerDisplayProps>(({ time, isActive, className
           {timeObj.minutes}
         </div>
         <div className="text-sm text-muted-foreground uppercase tracking-wider">minutes</div>
-      </div>
-      <div className="text-4xl text-muted-foreground">:</div>
-      <div className="text-center">
-        <div className={cn(
-          "text-6xl font-bold tabular-nums",
-          isActive ? "text-timer-active" : "text-timer-stopped"
-        )}>
-          {timeObj.seconds}
-        </div>
-        <div className="text-sm text-muted-foreground uppercase tracking-wider">seconds</div>
       </div>
     </div>
   );
