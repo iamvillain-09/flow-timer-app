@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Preferences } from '@capacitor/preferences';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 interface ScreenTimeState {
   accumulated: number; // seconds accumulated before current active session
@@ -10,6 +11,16 @@ interface ScreenTimeState {
 }
 
 const STORAGE_KEY = 'screen_time_data';
+const NOTIFICATION_ID = 1;
+
+const formatTime = (seconds: number) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+  return `${minutes}m`;
+};
 
 export const useScreenTimeTracker = () => {
   const [state, setState] = useState<ScreenTimeState>({
@@ -23,6 +34,9 @@ export const useScreenTimeTracker = () => {
   useEffect(() => {
     const loadSavedData = async () => {
       try {
+        // Request notification permissions
+        await LocalNotifications.requestPermissions();
+        
         const { value } = await Preferences.get({ key: STORAGE_KEY });
         if (value) {
           const saved = JSON.parse(value);
@@ -113,7 +127,34 @@ export const useScreenTimeTracker = () => {
     };
   }, [state.isActive, state.isPaused]);
 
-  const startTimer = useCallback(() => {
+  const updateNotification = useCallback(async (time: number, isActive: boolean, isPaused: boolean) => {
+    try {
+      if (isActive && !isPaused) {
+        await LocalNotifications.schedule({
+          notifications: [{
+            id: NOTIFICATION_ID,
+            title: 'Screen Time Tracker',
+            body: `Active: ${formatTime(time)}`,
+            ongoing: true,
+            autoCancel: false,
+            extra: { ongoing: true },
+            schedule: undefined,
+            sound: undefined,
+            attachments: undefined,
+            actionTypeId: undefined,
+            group: undefined,
+            groupSummary: false,
+          }]
+        });
+      } else {
+        await LocalNotifications.cancel({ notifications: [{ id: NOTIFICATION_ID }] });
+      }
+    } catch (error) {
+      console.log('Notification error (normal in web):', error);
+    }
+  }, []);
+
+  const startTimer = useCallback(async () => {
     const now = Date.now();
     setState(prev => ({
       ...prev,
@@ -123,7 +164,7 @@ export const useScreenTimeTracker = () => {
     }));
   }, []);
 
-  const stopTimer = useCallback(() => {
+  const stopTimer = useCallback(async () => {
     const now = Date.now();
     setState(prev => {
       let accumulated = prev.accumulated;
@@ -137,16 +178,18 @@ export const useScreenTimeTracker = () => {
         startTime: null,
       };
     });
-  }, []);
+    await updateNotification(0, false, false);
+  }, [updateNotification]);
 
   const resetTimer = useCallback(async () => {
     setState({ accumulated: 0, isActive: false, isPaused: false, startTime: null });
+    await updateNotification(0, false, false);
     try {
       await Preferences.remove({ key: STORAGE_KEY });
     } catch (error) {
       console.error('Failed to clear saved timer data:', error);
     }
-  }, []);
+  }, [updateNotification]);
 
   const getTime = useCallback(() => {
     let total = state.accumulated;
@@ -155,6 +198,12 @@ export const useScreenTimeTracker = () => {
     }
     return total;
   }, [state]);
+
+  // Update notification when state changes
+  useEffect(() => {
+    const time = getTime();
+    updateNotification(time, state.isActive, state.isPaused);
+  }, [state.isActive, state.isPaused, state.accumulated, updateNotification, getTime]);
 
   return {
     getTime,
