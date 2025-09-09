@@ -144,12 +144,12 @@ export const useScreenTimeTracker = () => {
 
   const updateNotification = useCallback(async (time: number, isActive: boolean, isPaused: boolean) => {
     try {
-      if (isActive && !isPaused) {
+      if (isActive) {
         await LocalNotifications.schedule({
           notifications: [{
             id: NOTIFICATION_ID,
             title: 'Screen Time Tracker',
-            body: `Active: ${formatTime(time)}`,
+            body: `${isPaused ? 'Paused' : 'Active'}: ${formatTime(time)}`,
             channelId: 'screen_time',
             ongoing: true,
             autoCancel: false,
