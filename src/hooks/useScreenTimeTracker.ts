@@ -34,9 +34,24 @@ export const useScreenTimeTracker = () => {
   useEffect(() => {
     const loadSavedData = async () => {
       try {
-        // Request notification permissions
+        // Request notification permissions and ensure Android notification channel
         await LocalNotifications.requestPermissions();
-        
+
+        try {
+          // Create/update Android notification channel for ongoing timer
+          await (LocalNotifications as any).createChannel?.({
+            id: 'screen_time',
+            name: 'Screen Time',
+            description: 'Ongoing screen time tracking',
+            importance: 4, // HIGH
+            visibility: 1, // PUBLIC on lock screen
+            lights: false,
+            vibration: false,
+          });
+        } catch (e) {
+          console.log('Channel create skipped (web/iOS):', e);
+        }
+
         const { value } = await Preferences.get({ key: STORAGE_KEY });
         if (value) {
           const saved = JSON.parse(value);
@@ -135,6 +150,7 @@ export const useScreenTimeTracker = () => {
             id: NOTIFICATION_ID,
             title: 'Screen Time Tracker',
             body: `Active: ${formatTime(time)}`,
+            channelId: 'screen_time',
             ongoing: true,
             autoCancel: false,
             extra: { ongoing: true },
@@ -204,6 +220,17 @@ export const useScreenTimeTracker = () => {
     const time = getTime();
     updateNotification(time, state.isActive, state.isPaused);
   }, [state.isActive, state.isPaused, state.accumulated, updateNotification, getTime]);
+
+  // Periodically refresh ongoing notification (minutes precision)
+  useEffect(() => {
+    if (state.isActive && !state.isPaused) {
+      const id = setInterval(() => {
+        const time = getTime();
+        updateNotification(time, true, false);
+      }, 60000);
+      return () => clearInterval(id);
+    }
+  }, [state.isActive, state.isPaused, getTime, updateNotification]);
 
   return {
     getTime,
